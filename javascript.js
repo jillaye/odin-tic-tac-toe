@@ -3,8 +3,6 @@
 // Players will be stored as objects
 // GameController (or displayController) object to control game flow
 
-// Start in Console
-
 // This is an IIFE. Pretty much the same as saying
 // function createBoard() {
 //    //do the stuff btwn the purple curly braces
@@ -19,12 +17,25 @@ const board = (() => {
 
     const rows = 3;
     const cols = 3;
+    const container = document.querySelector('.container');
     for (let x = 0; x < rows; x++) {
         board[x] = [];
         for (let y = 0; y < cols; y++) {
+            let square = document.createElement("div");
+            square.classList.add("square");
+            // Attach the "click" event to your button
+            square.addEventListener('click', () => {
+            // When there is a "click"
+            // it shows an alert in the browser
+                alert('Oh, you clicked me!')
+            })
+            container.appendChild(square);
             board[x][y] = createSquare(x, y);
         }
     }
+
+    // left off here: grid draws and looks nice!!
+
 
     function setSymbol(x, y, symbol) {
         if (board[x][y].symbol === "") {
