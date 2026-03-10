@@ -110,6 +110,10 @@ const createGameController = (() => {
     const playerO = createPlayer("playerO", "O");
     let currentPlayer = playerX;
     let chosenSquares = 0;
+    let inGame = true;
+    const modal = document.querySelector('#winner-modal');
+    const resetBtn = document.querySelector('#reset-btn');
+    const winnerText = document.querySelector('#winner-msg');
 
     function swapTurn() {
         currentPlayer === playerX ? currentPlayer = playerO : currentPlayer = playerX;
@@ -144,18 +148,35 @@ const createGameController = (() => {
         return false;
     }
 
+    function showWinner(name) {
+        inGame = false;
+        winnerText.textContent = `${name} WINS!`;
+        modal.classList.remove('hidden');
+    }
+
+    function showTie() {
+        inGame = false;
+        winnerText.textContent = 'Tie Game!';
+        modal.classList.remove('hidden');
+    }
+
+    resetBtn.onclick = () => {
+        inGame = true;
+        modal.classList.add('hidden');
+        board.reset();
+        chosenSquares = 0;
+    };
+
     function playGame() {
-        let isWinner = false;
         callback = function(x, y) {
+            if (!inGame) return;
             if (board.setSymbol(x, y, currentPlayer.symbol)) {
-                if (isWinner === true) {
-                    return;
+                chosenSquares++;
+                if (chosenSquares === 9){
+                    showTie();
                 }
                 if (checkForWin(x, y)) {
-                    isWinner = true;
-                    alert(`${currentPlayer.name} WINS!`)
-                    board.reset();
-                    return;
+                    showWinner(currentPlayer.name);
                 } else {
                     swapTurn();
                 }
