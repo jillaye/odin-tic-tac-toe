@@ -1,8 +1,3 @@
-// Everything should fit into three objects:
-// Gameboard object holds an array  => wrap into a factory inside an IIFE
-// Players will be stored as objects
-// GameController (or displayController) object to control game flow
-
 // This is an IIFE. Pretty much the same as saying
 // function createBoard() {
 //    //do the stuff btwn the purple curly braces
@@ -11,6 +6,17 @@
 const board = (() => {
     const board = [];
 
+    function setCallback(callback) {
+        const squares = document.querySelectorAll('.square');
+        squares.forEach(square => {
+            square.addEventListener('click', function() {
+                x = square.id.charAt(1)
+                y = square.id.charAt(3)
+                callback(x, y);
+            });
+        });
+    }
+    
     function createSquare(x, y) {
         return { x: x, y: y, symbol: "" };
     }
@@ -23,32 +29,21 @@ const board = (() => {
         for (let y = 0; y < cols; y++) {
             let square = document.createElement("div");
             square.classList.add("square");
-            // Attach the "click" event to your button
-            square.addEventListener('click', () => {
-            // When there is a "click"
-            // it shows an alert in the browser
-                alert('Oh, you clicked me!')
-            })
+            square.setAttribute("id", `r${x}c${y}`)
             container.appendChild(square);
             board[x][y] = createSquare(x, y);
         }
     }
 
-    // left off here: grid draws and looks nice!!
-
-
+    // ONLY THIS function INTERACTS WITH DOM
     function setSymbol(x, y, symbol) {
-        if (board[x][y].symbol === "") {
+        if ( symbol === "" || board[x][y].symbol === "") {
             board[x][y].symbol = symbol;
-            console.log("Setting symbol")
+            let theSquare = document.querySelector(`#r${x}c${y}`);
+            theSquare.textContent = symbol;
             return true;
-        } else {
-            return false;
         }
-    }
-
-    function getSymbol(x, y) {
-        return board[x][y].symbol;
+        return false;
     }
 
     function getRow(x) {
@@ -93,12 +88,12 @@ const board = (() => {
     
     return {
         reset,
-        getSymbol,
         setSymbol,
         getRow,
         getCol,
         getFallingDiagonal,
         getRisingDiagonal,
+        setCallback,
     }
 })();
 
@@ -108,13 +103,6 @@ function createPlayer(name, symbol) {
         symbol: symbol,
         wins: 0,
     }
-}
-
-function getUserInput(player) {
-    let x = prompt(player.name + " Enter x:");
-    let y = prompt(player.name + " Enter y:");
-    console.log("x =", x, " y = ", y, "\n");
-    return { x, y };
 }
 
 const createGameController = (() => {
@@ -158,18 +146,22 @@ const createGameController = (() => {
 
     function playGame() {
         let isWinner = false;
-        while (!isWinner) {
-            let { x, y } = getUserInput(currentPlayer);
+        callback = function(x, y) {
             if (board.setSymbol(x, y, currentPlayer.symbol)) {
-                chosenSquares++;
-            }
-            if (checkForWin(x, y)) {
-                isWinner = true;
-            } else {
-                swapTurn();
-            }
-        }
-        console.log(`${currentPlayer.name} WINS!`)
+                if (isWinner === true) {
+                    return;
+                }
+                if (checkForWin(x, y)) {
+                    isWinner = true;
+                    alert(`${currentPlayer.name} WINS!`)
+                    board.reset();
+                    return;
+                } else {
+                    swapTurn();
+                }
+            };
+        };
+        board.setCallback(callback);
     }
 
     playGame();

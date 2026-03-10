@@ -5,10 +5,13 @@
     gap: 10px;
     width: 620px;
     background-color: blue;
+    text-align: center;
 }
 
 .square {
     width: 200px;
     height: 200px;
     background-color: white;
+    font-size: 150px;
+    font-family: 'roboto';
 }
